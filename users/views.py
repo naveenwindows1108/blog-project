@@ -7,6 +7,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from .utility.jwt_auth import jwt_required
 from .serializers import UserRegisterSerializer
+from .serializers import ListProfilesSerializer
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+
 
 class RegisterAPIView(APIView):
     def post(self, request):
@@ -49,18 +53,33 @@ def logout(request):
     return success_message(message=' logOut successfully')
 
 
-@jwt_required
-def profile(request):
-    if request.method != 'GET':
-        return error_message(message='use GET method only', status_code=405)
-    if not request.user.is_authenticated:
-        return error_message('login first to fetch profile', 401)
-    user = request.user
-    return success_message(data={'user': user.username}, message='Profile fetched successfully', status_code=200)
+# @jwt_required
+# def profile(request):
+#     if request.method != 'GET':
+#         return error_message(message='use GET method only', status_code=405)
+#     if not request.user.is_authenticated:
+#         return error_message('login first to fetch profile', 401)
+#     user = request.user
+#     return success_message(data={'user': user.username}, message='Profile fetched successfully', status_code=200)
 
 
-# def getcsrf(request):
-#     if request.method == 'GET':
-#         return JsonResponse({
-#             'csrf_token': get_token(request)
-#         })
+class GetProfilesAPIView(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = ListProfilesSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ProfileAPI(APIView):
+    def get_user_object(self, pk):
+        return get_object_or_404(User, id=pk)
+
+    def get(self, request, pk):
+        user = self.get_user_object(pk=pk)
+        serializer = ListProfilesSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # def put(self, request, pk):
+    #     new_data=request.data
+    #     serializer = ListProfilesSerializer(self.get_user_object(pk=pk))
+    #     return Response(serializer.data, status=status.HTTP_200_OK)

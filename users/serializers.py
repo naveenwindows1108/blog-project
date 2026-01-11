@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from rest_framework import status
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
-from rest_framework.response import Response
 
 
 class LoginSerializer(serializers.Serializer):
@@ -32,11 +30,17 @@ class UserRegisterSerializer(serializers.Serializer):
         validate_password(password=password)
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError('user already exists')
-        data['email']=email
-        data['password']=password
+        data['email'] = email
+        data['password'] = password
         return data
 
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['email'], email=validated_data['email'], password=validated_data['password'])
         return user
+
+
+class ListProfilesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email','first_name','last_name']
