@@ -40,7 +40,7 @@ class UserRegisterSerializer(serializers.Serializer):
         return user
 
 
-class ListProfilesSerializer(serializers.ModelSerializer):
+class CRUDSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email','first_name','last_name']
