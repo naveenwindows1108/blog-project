@@ -41,7 +41,25 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework_simplejwt',     
+    'rest_framework_simplejwt.token_blacklist'
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+from datetime import timedelta
+JWT_SIMPLE={
+    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME':timedelta(minutes=60),
+    'BLACKLIST_AFTER_ROTATION':True,
+    'ROTATE_REFRESH_TOKEN':True
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
