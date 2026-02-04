@@ -1,17 +1,17 @@
+import datetime
+from .receivers import read_signal
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from .serializers import LoginSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserRegisterSerializer
 from .serializers import CRUDSerializer
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
-from rest_framework import generics
-from rest_framework import mixins
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import viewsets
-from rest_framework.decorators import action
-#naveenlars
+from django.contrib.auth import get_user_model
+User = get_user_model()
+# naveenlars
 
 # class RegisterAPIView(APIView):
 #     def post(self, request):
@@ -32,8 +32,6 @@ from rest_framework.decorators import action
 
 #     def post(self, request):
 #         return self.create(request)
-
-from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class LoginAPIView(APIView):
@@ -71,8 +69,6 @@ class LogoutAPIView(APIView):
             return Response({
                 'error': 'invalid or expired refresh token'
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        
 
 
 # class GetProfilesAPIView(APIView):
@@ -148,8 +144,31 @@ class LogoutAPIView(APIView):
 #         return self.destroy(request, *args, **kwargs)
 
 
+class Home(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        date_time = datetime.datetime.now()
+        read_signal.send(sender=request, date_time=date_time)
+        return Response(data={
+            'Home': 'Hello World'
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class UsersViewset(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = User.objects.all()
     serializer_class = CRUDSerializer
     # in modern development, get_serializer_class is standard way
